@@ -1,0 +1,24 @@
+serviceAccount:
+  create: true
+  name: "external-dns"
+
+rbac:
+  create: true
+
+provider: azure
+policy: upsert-only
+domainFilters:
+  - steadfast.kasunt.fe.gl00.net
+sources:
+  - service
+  - ingress
+
+extraVolumes:
+  - name: azure-config-file
+    secret:
+      secretName: azure-config-file
+
+extraVolumeMounts:
+  - name: azure-config-file
+    mountPath: /etc/kubernetes
+    readOnly: true

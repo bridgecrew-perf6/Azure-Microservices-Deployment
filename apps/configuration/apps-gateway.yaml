@@ -1,0 +1,29 @@
+apiVersion: networking.enterprise.mesh.gloo.solo.io/v1beta1
+kind: VirtualGateway
+metadata:
+  name: ingress-gateway
+  namespace: app-config
+spec:
+  ingressGatewaySelectors:
+  - portName: https
+    destinationSelectors:
+    - kubeServiceMatcher:
+        clusters:
+        - west-cluster
+        labels:
+          istio: ingressgateway-lb
+        namespaces:
+        - istio-ingress
+  connectionHandlers:
+  - connectionOptions:
+      sslConfig:
+        secretName: laptop-store-tls
+        tlsMode: SIMPLE
+    connectionMatch: 
+      serverNames:
+      - apps.steadfast.kasunt.fe.gl00.net
+    http:
+      routeConfig:
+      - virtualHostSelector:
+          namespaces:
+          - app-config

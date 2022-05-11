@@ -1,0 +1,13 @@
+appgw:
+  subscriptionId: $SP_SUBSCRIPTIONID
+  resourceGroup: $AZ_MGMT_CLUSTER_RG
+  name: $AZ_GW_CONTROLLER_NAME
+  usePrivateIP: false
+  shared: false
+
+armAuth:
+  type: servicePrincipal
+  secretJSON: $BASE64_ENCODED_GW_PARAMETERS
+
+rbac:
+  enabled: true

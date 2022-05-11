@@ -1,0 +1,31 @@
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: custom-tags-telemetry
+  namespace: istio-config
+spec:
+  tracing:
+    - providers:
+      - name: opencensus-tracing
+      randomSamplingPercentage: 100.00
+      customTags:
+        userId:
+          header:
+            name: user.id
+            defaultValue: unknown
+        tenantId:
+          header:
+            name: tenant.id
+            defaultValue: unknown
+        x-userId:
+          header:
+            name: x_user_id
+            defaultValue: unknown
+        x-tenantId:
+          header:
+            name: x_tenant_id
+            defaultValue: unknown
+        baggage:
+          header:
+            name: baggage
+            defaultValue: unknown

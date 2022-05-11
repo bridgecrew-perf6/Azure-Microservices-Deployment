@@ -1,0 +1,24 @@
+apiVersion: networking.enterprise.mesh.gloo.solo.io/v1beta1
+kind: RouteTable
+metadata:
+  name: apps-portal-rt
+  namespace: app-config
+  labels:
+    route: apps
+spec:
+  routes:
+    - matchers:
+      - uri:
+          prefix: /
+      name: portal-ui
+      options:
+        extauth:
+          configRef:
+            name: okta-oidc-authconfig
+            namespace: apps
+      routeAction:
+        destinations:
+          - kubeService:
+              clusterName: west-cluster
+              name: portal-ui
+              namespace: apps

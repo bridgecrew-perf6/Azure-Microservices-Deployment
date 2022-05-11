@@ -1,0 +1,38 @@
+apiVersion: networking.enterprise.mesh.gloo.solo.io/v1beta1
+kind: WasmDeployment
+metadata:
+  name: claims-to-headers-filter
+  namespace: app-config
+  labels:
+    app: claims-to-headers-filter
+spec:
+  filters:
+  - filterContext: GATEWAY
+    rootId: claims_to_headers
+    insertBeforeFilter: envoy.filters.http.router
+    staticFilterConfig: 
+      '@type': type.googleapis.com/google.protobuf.StringValue
+      value: |
+        {
+          "cookie": "cookie",
+          "token": "access_token",
+          "id_token_header": "x-token",
+          "claim_to_header_map": [{
+            "claim": "tenant_id",
+            "header": "x-tenant-id"
+          }, 
+          {
+            "claim": "user_id",
+            "header": "x-user-id"
+          }]
+        }
+    wasmImageSource:
+      wasmImageTag: webassemblyhub.io/kasunt/claims-to-headers:0.1
+  workloadSelector:
+  - kubeWorkloadMatcher:
+      clusters:
+      - west-cluster
+      labels:
+        istio: ingressgateway
+      namespaces:
+      - istio-ingress

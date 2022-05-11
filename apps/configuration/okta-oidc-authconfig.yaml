@@ -1,0 +1,25 @@
+apiVersion: enterprise.gloo.solo.io/v1
+kind: AuthConfig
+metadata:
+  name: okta-oidc-authconfig
+  namespace: apps
+spec:
+  configs:
+  - oauth2:
+      oidcAuthorizationCode:
+        issuerUrl: https://dev-3339095.okta.com/oauth2/default
+        appUrl: https://apps.steadfast.kasunt.fe.gl00.net
+        callbackPath: /login
+        clientId: 0oa3tiotor5NQg3lY5d7
+        clientSecretRef:
+          name: okta-oidc-client-secret
+          namespace: apps
+        scopes:
+        - email
+        logoutPath: /logout
+        session:
+          cookieOptions:
+            notSecure: true
+            maxAge: 3600
+        headers:
+          idTokenHeader: "x-token"

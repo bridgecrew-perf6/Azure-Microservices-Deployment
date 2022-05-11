@@ -1,0 +1,6 @@
+rate-limiter: 
+  enabled: true
+ext-auth-service: 
+  enabled: true
+enterpriseAgent:
+  enabled: false

@@ -1,0 +1,8 @@
+auth:
+  enabled: false
+  usernames:
+    - products
+  passwords:
+    - products
+  databases:
+    - productsdb

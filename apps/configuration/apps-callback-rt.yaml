@@ -1,0 +1,20 @@
+apiVersion: networking.enterprise.mesh.gloo.solo.io/v1beta1
+kind: RouteTable
+metadata:
+  name: apps-callback-rt
+  namespace: app-config
+  labels:
+    route: callback
+spec:
+  routes:
+    - matchers:
+      - uri:
+          prefix: /callback
+      name: callback
+      routeAction:
+        pathRewrite: /
+        destinations:
+          - kubeService:
+              clusterName: west-cluster
+              name: portal-ui
+              namespace: apps

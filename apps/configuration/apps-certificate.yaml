@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: laptop-store-tls
+  namespace: istio-ingress
+spec:
+  secretName: laptop-store-tls
+  commonName: apps.steadfast.kasunt.fe.gl00.net
+  dnsNames:
+  - apps.steadfast.kasunt.fe.gl00.net
+  issuerRef:
+    name: global-cert-issuer
+    kind: ClusterIssuer
+

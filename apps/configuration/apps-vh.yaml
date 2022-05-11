@@ -1,0 +1,28 @@
+apiVersion: networking.enterprise.mesh.gloo.solo.io/v1beta1
+kind: VirtualHost
+metadata:
+  name: apps-vh
+  namespace: app-config
+spec:
+  domains:
+  - apps.steadfast.kasunt.fe.gl00.net
+  routes:
+    - matchers:
+      - uri:
+          prefix: /
+      delegateAction:
+        selector:
+          namespaces:
+          - app-config
+          labels:
+            route: callback
+
+    - matchers:
+      - uri:
+          prefix: /
+      delegateAction:
+        selector:
+          namespaces:
+          - app-config
+          labels:
+            route: apps

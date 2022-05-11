@@ -1,0 +1,111 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: argocd-applications-template-ci
+  namespace: gitops
+spec:
+  generators:
+  - list: 
+      elements:
+      - cluster: kasunt-sf-west-cluster
+        releaseName: portal-ui
+        releaseVersion: 0.1.0
+        helmOverrideValues: |
+          image:
+            repository: 'kasuntimagesacr.azurecr.io/portal-ui'
+          imagePullSecret: acr-reg-pull-secret
+          env:
+            - name: ApiSettings__ProductsServiceAddress
+              value: http://products-service.apps.svc/api/v1/
+            - name: ApiSettings__OrdersServiceAddress
+              value: http://orders-service.apps.svc/api/v1/
+            - name: ApiSettings__CartServiceAddress
+              value: http://cart-service.apps.svc/api/v1/
+            - name: Auth__TokenHeader
+              value: x-token
+            - name: Auth__UserIdHeader
+              value: x-user-id
+            - name: Auth__UserIdClaim
+              value: user_id
+      - cluster: kasunt-sf-west-cluster
+        releaseName: products-service
+        releaseVersion: 0.1.0
+        helmOverrideValues: |
+          image:
+            repository: 'kasuntimagesacr.azurecr.io/products-service'
+          imagePullSecret: acr-reg-pull-secret
+          env:
+            - name: DatabaseSettings__ConnectionString
+              value: mongodb://mongodb.storage.svc:27017
+      - cluster: kasunt-sf-west-cluster
+        releaseName: cart-service
+        releaseVersion: 0.1.0
+        helmOverrideValues: |
+          image:
+            repository: 'kasuntimagesacr.azurecr.io/cart-service'
+          imagePullSecret: acr-reg-pull-secret
+          env:
+            - name: CacheSettings__ConnectionString
+              value: redis-master.storage.svc:6379
+            - name: EventBusSettings__HostAddress
+              value: amqp://rabbitmq:rabbitmq@rabbitmq.storage.svc:5672
+      - cluster: kasunt-sf-west-cluster
+        releaseName: notifications-service
+        releaseVersion: 0.1.0
+        helmOverrideValues: |
+          image:
+            repository: 'kasuntimagesacr.azurecr.io/notifications-service'
+          imagePullSecret: acr-reg-pull-secret
+      - cluster: kasunt-sf-west-cluster
+        releaseName: payments-service
+        releaseVersion: 0.1.0
+        helmOverrideValues: |
+          image:
+            repository: 'kasuntimagesacr.azurecr.io/payments-service'
+          imagePullSecret: acr-reg-pull-secret
+          env:
+            - name: EventBusSettings__HostAddress
+              value: amqp://rabbitmq:rabbitmq@rabbitmq.storage.svc:5672
+      - cluster: kasunt-sf-west-cluster
+        releaseName: orders-service
+        releaseVersion: 0.1.0
+        helmOverrideValues: |
+          image:
+            repository: 'kasuntimagesacr.azurecr.io/orders-service'
+          imagePullSecret: acr-reg-pull-secret
+          env:
+            - name: ConnectionStrings__OrdersConnectionString
+              value: Server=mssql-service-mssql-latest.storage.svc;Database=ordersdb;User Id=sa;Password=passwd00
+            - name: GrpcSettings__NotificationsUrl
+              value: http://notifications-service.apps.svc:5000
+            - name: EventBusSettings__HostAddress
+              value: amqp://rabbitmq:rabbitmq@rabbitmq.storage.svc:5672
+  template: 
+    metadata:
+      name: '{{releaseName}}'
+    spec:
+      project: 'argocd-microservices-project'
+      source:
+        repoURL: kasuntimagesacr.azurecr.io
+        targetRevision: '{{releaseVersion}}'
+        chart: 'helm/{{releaseName}}'
+        helm:
+          releaseName: '{{releaseName}}'
+          values: |
+            {{helmOverrideValues}}
+      destination:
+        name: '{{cluster}}'
+        namespace: apps
+      syncPolicy:
+        syncOptions:    
+          - CreateNamespace=false
+        automated:
+          prune: true
+          selfHeal: true
+      ignoreDifferences:
+        - group: apps
+          kind: Deployment
+          jqPathExpressions:
+            - .spec.template.spec.containers[] | select(.name == "istio-proxy")
+            - .spec.template.spec.initContainers[] | select(.name == "istio-init")
+            - .spec.template.spec.initContainers[] | select(.name == "istio-validation")
