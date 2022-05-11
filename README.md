@@ -5,6 +5,8 @@ PoC for Steadfast.
 This provisions Gloo Mesh 1.2.11 on 3 different Azure clusters using Istio 1.12.2.
 Deploys various services to support running [demo microservices](https://github.com/pseudonator/Azure-Microservices).
 
+<img src="https://user-images.githubusercontent.com/2648624/167958044-3d332c64-18f5-4fa2-9a29-5b8bac46fa79.png" width=50% height=50%>
+
 ## Prerequisites
 
 After `az login` you can use the following command to get `subscription-id` and `tenant-id`.
